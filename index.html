@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spooky Card Shuffle</title>
+<style>
+:root{color-scheme:light;font-family:Arial,Helvetica,sans-serif;background:#efefef;color:#111}*{box-sizing:border-box}body{margin:0}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid #777;outline-offset:3px}.shell{width:min(1080px,calc(100% - 32px));margin:36px auto 70px}.top{text-align:center;margin-bottom:26px}.top h1{font-size:clamp(29px,5vw,52px);letter-spacing:-.055em;margin:0 0 6px;font-weight:900}.top p{font-size:12px;letter-spacing:.19em;font-weight:700;margin:0;color:#555}.stage{border:1px solid #d1d1d1;background:#f8f8f8;border-radius:15px;padding:clamp(16px,3vw,32px);min-height:500px}.pack-area{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:23px;padding:14px 0 20px}.pack{position:relative;overflow:hidden;width:246px;height:337px;background:#101010;color:white;border:2px solid #000;border-radius:9px;box-shadow:12px 14px 0 #d6d6d6;display:flex;flex-direction:column;justify-content:space-between;padding:19px;text-align:left;cursor:pointer;transition:transform .2s}.pack:hover{transform:rotate(-2deg) translateY(-4px)}.tear{border-top:2px dashed white;padding-top:9px;font-size:10px;letter-spacing:.08em}.pack-title{font-size:31px;font-weight:900;line-height:1.03;letter-spacing:-.05em}.pack-sub{font-size:13px;font-weight:600;margin-top:12px;line-height:1.4}.pack-bottom{border-top:1px solid #777;padding-top:12px;font-weight:700;font-size:12px;line-height:1.8}.btn{border:2px solid #111;background:#111;color:white;padding:14px 23px;border-radius:6px;font-weight:800;letter-spacing:.02em}.btn:hover{background:#333}.btn.secondary{background:white;color:#111}.btn.secondary:hover{background:#e5e5e5}.hint{color:#666;font-size:12px;text-align:center;max-width:350px;line-height:1.5}.hidden{display:none!important}.bar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}.bar .eyebrow{font-weight:800;font-size:12px;letter-spacing:.12em}.bar .btn{padding:10px 15px;font-size:13px}.black{background:#101010;color:white;min-height:200px;padding:23px;border-radius:7px;display:flex;flex-direction:column;justify-content:space-between}.black .eyebrow{font-size:11px;letter-spacing:.12em;color:#bbb;font-weight:800}.black .prompt{font-size:clamp(22px,3.2vw,33px);line-height:1.15;font-weight:900;max-width:750px;margin:26px 0}.black footer{font-size:10px;font-weight:800;color:#ccc;display:flex;justify-content:space-between}.heading{font-size:12px;letter-spacing:.1em;margin:22px 0 12px;font-weight:900}.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.answer{min-height:177px;padding:13px;background:#fff;color:#111;border:2px solid #cfcfcf;border-radius:7px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;transition:transform .16s,border-color .16s,box-shadow .16s}.answer:hover{transform:translateY(-4px);border-color:#777}.answer.selected{border:3px solid #111;box-shadow:5px 5px 0 #ccc}.answer .number,.answer footer{color:#666;font-size:10px;letter-spacing:.04em}.answer strong{font-size:16px;line-height:1.25}.result{margin-top:22px;padding:22px;border:2px solid #111;background:white;border-radius:7px}.result .eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;color:#555}.result h2{font-size:clamp(20px,3vw,28px);line-height:1.24;margin:13px 0 20px}.actions{display:flex;gap:10px;flex-wrap:wrap}.timer{margin-top:20px;text-align:center;border:1px solid #ccc;background:white;border-radius:7px;padding:22px}.timer-label{font-size:12px;font-weight:800;letter-spacing:.1em}.clock{font-size:clamp(45px,8vw,74px);font-weight:900;letter-spacing:-.06em;font-variant-numeric:tabular-nums;margin:10px 0}.progress{height:9px;border-radius:99px;background:#ddd;overflow:hidden;margin:15px auto 21px;max-width:600px}.progress>div{height:100%;background:#111;width:100%;transition:width .25s linear}.timer .actions{justify-content:center}.foot{text-align:center;color:#666;margin:20px 0;font-size:11px;font-weight:800;letter-spacing:.14em}/* Shuffleable monochrome card deck */
+.deck-stage{width:290px;height:365px;position:relative;display:grid;place-items:center;perspective:850px;cursor:pointer;border:0;background:transparent;padding:0;isolation:isolate}
+.deck-card{position:absolute;top:15px;left:24px;width:242px;height:326px;border:2px solid #111;border-radius:11px;background:#fff;box-shadow:0 8px 18px #0002;display:flex;flex-direction:column;justify-content:space-between;text-align:left;padding:20px;pointer-events:none;transform-origin:center bottom}
+.deck-card:nth-child(1){background:#111;color:#fff;transform:translate(-13px,10px) rotate(-8deg)}
+.deck-card:nth-child(2){transform:translate(12px,5px) rotate(7deg)}
+.deck-card:nth-child(3){background:#111;color:#fff;transform:translate(-4px,-2px) rotate(-3deg)}
+.deck-card:nth-child(4){transform:translate(6px,-9px) rotate(3deg)}
+.deck-card:nth-child(5){background:#fff;color:#111;transform:translate(0,-15px) rotate(0deg)}
+.deck-card .deck-kicker{font-size:11px;font-weight:800;letter-spacing:.12em}
+.deck-card .deck-title{font-size:30px;font-weight:900;letter-spacing:-.055em;line-height:1.06}
+.deck-card .deck-bottom{font-size:11px;font-weight:800}
+.deck-stage:hover:not(.shuffling) .deck-card:last-child{transform:translateY(-23px)}
+.deck-stage.shuffling .deck-card:nth-child(1){animation:shuffle-left 1.28s cubic-bezier(.4,0,.2,1) both}
+.deck-stage.shuffling .deck-card:nth-child(2){animation:shuffle-right 1.28s cubic-bezier(.4,0,.2,1) .07s both}
+.deck-stage.shuffling .deck-card:nth-child(3){animation:shuffle-left 1.28s cubic-bezier(.4,0,.2,1) .14s both}
+.deck-stage.shuffling .deck-card:nth-child(4){animation:shuffle-right 1.28s cubic-bezier(.4,0,.2,1) .21s both}
+.deck-stage.shuffling .deck-card:nth-child(5){animation:shuffle-center 1.28s ease-in-out .05s both}
+@keyframes shuffle-left{0%{transform:translate(-13px,10px) rotate(-8deg)}32%{transform:translate(-100px,-35px) rotate(-23deg)}65%{transform:translate(85px,-55px) rotate(17deg)}100%{transform:translate(0,-15px) rotate(0)}}
+@keyframes shuffle-right{0%{transform:translate(12px,5px) rotate(7deg)}32%{transform:translate(105px,-35px) rotate(23deg)}65%{transform:translate(-80px,-55px) rotate(-16deg)}100%{transform:translate(0,-15px) rotate(0)}}
+@keyframes shuffle-center{0%{transform:translate(0,-15px) rotate(0)}30%{transform:translate(0,-90px) rotate(7deg)}65%{transform:translate(0,15px) rotate(-7deg)}100%{transform:translate(0,-15px) rotate(0)}}
+.game-reveal{animation:deal-in .35s ease-out both}@keyframes deal-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:850px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:520px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.answer{min-height:148px}.stage{padding:14px}.black{min-height:180px}.answer strong{font-size:15px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* playing cards based on the CAH */
+:root{--card-width:248px;--card-height:350px}
+.shell{width:min(1200px,calc(100% - 28px))}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px;align-items:start}
+.black,.answer{width:100%;max-width:var(--card-width);height:var(--card-height);min-height:var(--card-height);border-radius:13px;padding:24px 21px 20px;box-shadow:0 3px 9px #00000012;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:0;text-align:left}
+.black{background:#050505;color:white;border:2px solid #050505;margin:0 0 20px}
+.black .eyebrow{display:none}
+.black .prompt{font-size:clamp(20px,2.1vw,26px);line-height:1.16;font-weight:900;letter-spacing:-.025em;margin:0;max-width:none;min-height:0;flex:1;overflow-y:auto;overflow-wrap:break-word;scrollbar-width:thin}
+.black footer{font-size:10px;color:#e9e9e9;font-weight:700;letter-spacing:.01em;flex-shrink:0;padding-top:16px}
+.black footer span::before{content:'▣  ';font-size:15px;vertical-align:-1px}
+.black footer span{font-size:0}
+.black footer span::after{content:'BLACK CARD';font-size:10px}
+.answer{border:2px solid #ddd;background:#fff;color:#0b0b0b;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.answer strong{font-size:clamp(20px,2vw,26px);line-height:1.16;letter-spacing:-.025em;font-weight:900;display:block;overflow-y:auto;overflow-wrap:break-word;min-height:0;flex:1;scrollbar-width:thin}
+.answer .number{display:none}
+.answer footer{display:block;font-size:10px;color:#666;letter-spacing:.01em;font-weight:700;flex-shrink:0;padding-top:16px}
+.answer footer::before{content:'▣  ';font-size:15px;vertical-align:-1px}
+.answer:hover{transform:translateY(-7px);border-color:#777}
+.answer.selected{border:3px solid #111;box-shadow:7px 7px 0 #c6c6c6}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.black,.answer{width:100%;height:auto;min-height:0;aspect-ratio:5/7;padding:clamp(12px,3vw,21px);border-radius:11px}.black{max-width:calc((100% - 12px)/2)}.black .prompt,.answer strong{font-size:clamp(15px,3.3vw,23px)}.black footer,.answer footer{padding-top:8px;font-size:9px}}
+@media(min-width:701px) and (max-width:950px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Full stack shuffle with staggered alternating splits. */
+.deck-stage{width:340px;height:410px;perspective:1000px;overflow:visible}
+.deck-stage .deck-card{top:17px;left:44px;width:248px;height:350px;border-radius:13px;transform-origin:50% 85%;box-sizing:border-box}
+.deck-stage .deck-layer{padding:0;background:#fff;box-shadow:0 1px 1px #0003;transform:translate(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px)) rotate(calc((var(--i) - 16)*.12deg));z-index:calc(var(--i) + 1)}
+.deck-stage .deck-layer.dark{background:#101010;border-color:#101010}
+.deck-stage .deck-face{background:#111;color:white;transform:translate(0,-24px) rotate(-1deg);z-index:40;padding:25px;box-shadow:0 9px 20px #0003}
+.deck-stage:hover:not(.shuffling) .deck-face{transform:translate(0,-34px) rotate(-2deg)}
+.deck-stage.shuffling .deck-layer{animation:full-stack-shuffle 1.55s ease-in-out both;animation-delay:calc(var(--i)*12ms)}
+.deck-stage.shuffling .deck-face{animation:face-stack-shuffle 1.55s ease-in-out both}
+@keyframes full-stack-shuffle{
+  0%{transform:translate(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px)) rotate(0)}
+  24%{transform:translate(calc(var(--side)*75px),calc(-56px + var(--i)*.8px)) rotate(calc(var(--side)*13deg))}
+  48%{transform:translate(calc(var(--side)*112px),calc(-28px + var(--i)*.6px)) rotate(calc(var(--side)*19deg))}
+  72%{transform:translate(calc(var(--side)*-38px),calc(-12px + var(--i)*.6px)) rotate(calc(var(--side)*-7deg))}
+  100%{transform:translate(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px)) rotate(calc((var(--i) - 16)*.12deg))}
+}
+@keyframes face-stack-shuffle{
+  0%,100%{transform:translate(0,-24px) rotate(-1deg)}
+  25%{transform:translate(-78px,-80px) rotate(-15deg)}
+  50%{transform:translate(90px,-100px) rotate(16deg)}
+  75%{transform:translate(10px,-49px) rotate(4deg)}
+}
+@media(max-width:420px){.deck-stage{transform:scale(.83);margin:-28px 0}}
+
+/* Angled tabletop viewpoint. The cards lie flat on the table and shuffle in its plane. */
+.deck-stage{width:440px;height:335px;perspective:950px;perspective-origin:50% 38%;align-items:center;justify-items:center}
+.deck-table{position:relative;display:block;width:340px;height:410px;transform-style:preserve-3d;transform:rotateX(61deg) rotateZ(-13deg) translateY(-18px);filter:drop-shadow(16px 33px 16px #0003);pointer-events:none}
+.deck-table .deck-card{backface-visibility:hidden}
+.deck-stage:hover:not(.shuffling) .deck-face{transform:translate(0,-31px) rotate(-2deg)}
+@media(max-width:520px){.deck-stage{width:100%;height:295px;perspective:800px}.deck-table{transform:scale(.79) rotateX(61deg) rotateZ(-13deg) translateY(-18px)} }
+@media(max-width:420px){.deck-stage{transform:none;margin:0}}
+
+/* Full-deck tabletop riffle: interleave, cascade down, then drop and settle. */
+.deck-stage{height:345px;perspective:1150px}
+.deck-table{transform:rotateX(59deg) rotateZ(-10deg) translateY(-10px);transform-style:preserve-3d}
+.deck-stage .deck-layer{transform-origin:50% 87%;backface-visibility:visible;will-change:transform}
+.deck-stage.shuffling .deck-table{animation:deck-drop 3.45s ease-in-out both}
+.deck-stage.shuffling .deck-layer{animation:riffle-cascade 3.3s cubic-bezier(.45,.05,.35,1) both;animation-delay:calc(var(--i)*4ms)}
+.deck-stage.shuffling .deck-face{animation:riffle-top-cascade 3.3s ease-in-out both}
+@keyframes riffle-cascade{
+  0%{transform:translate3d(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px),0) rotateZ(0deg)}
+  15%{transform:translate3d(calc(var(--side)*104px),calc(-15px + var(--i)*.7px),calc(var(--i)*.2px)) rotateZ(calc(var(--side)*-9deg))}
+  33%{transform:translate3d(calc(var(--side)*96px),calc(-15px + var(--i)*.7px),calc(15px + var(--i)*.35px)) rotateZ(calc(var(--side)*-6deg)) rotateY(calc(var(--side)*-36deg)) rotateX(-12deg)}
+  49%{transform:translate3d(calc(var(--side)*54px),calc(-11px + var(--i)*.45px),calc(23px - var(--i)*.3px)) rotateZ(calc(var(--side)*-3deg)) rotateY(calc(var(--side)*-48deg)) rotateX(-16deg)}
+  61%{transform:translate3d(calc(var(--side)*7px),calc(-10px + var(--i)*.46px),calc(25px + var(--i)*.35px)) rotateZ(calc(var(--side)*1deg)) rotateY(calc(var(--side)*-12deg))}
+  72%{transform:translate3d(calc(var(--side)*1px),calc(-18px + var(--i)*.4px),calc(19px + (32 - var(--i))*.65px)) rotateX(-7deg)}
+  83%{transform:translate3d(0,calc(14px + (32 - var(--i))*.65px),0) rotateX(0deg)}
+  90%{transform:translate3d(0,calc(24px + (32 - var(--i))*.35px),-7px)}
+  96%{transform:translate3d(0,calc((16 - var(--i))*1.3px - 4px),0)}
+  100%{transform:translate3d(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px),0) rotateZ(calc((var(--i) - 16)*.12deg))}
+}
+@keyframes riffle-top-cascade{
+  0%{transform:translate(0,-24px) rotateZ(-1deg)}
+  15%{transform:translate(-104px,-30px) rotateZ(10deg)}
+  33%{transform:translate(-96px,-33px) rotateZ(8deg) rotateY(34deg) rotateX(-10deg)}
+  49%{transform:translate(-54px,-25px) rotateZ(4deg) rotateY(48deg) rotateX(-15deg)}
+  61%{transform:translate(-7px,-22px) rotateZ(1deg) rotateY(10deg)}
+  72%{transform:translate3d(0,-5px,20px) rotateX(-7deg)}
+  83%{transform:translate3d(0,19px,0) rotateX(0)}
+  90%{transform:translate3d(0,28px,-7px)}
+  96%{transform:translate(0,-28px)}
+  100%{transform:translate(0,-24px) rotateZ(-1deg)}
+}
+@keyframes deck-drop{
+  0%,70%{transform:rotateX(59deg) rotateZ(-10deg) translateY(-10px)}
+  81%{transform:rotateX(59deg) rotateZ(-10deg) translateY(-10px)}
+  89%{transform:rotateX(59deg) rotateZ(-10deg) translateY(39px)}
+  94%{transform:rotateX(59deg) rotateZ(-10deg) translateY(22px)}
+  100%{transform:rotateX(59deg) rotateZ(-10deg) translateY(-10px)}
+}
+@media(max-width:520px){.deck-stage{height:295px}.deck-table{transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(-10px)}.deck-stage.shuffling .deck-table{animation-name:deck-drop-mobile}}
+@keyframes deck-drop-mobile{
+  0%,81%{transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(-10px)}
+  89%{transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(39px)}
+  94%{transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(22px)}
+  100%{transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(-10px)}
+}
+@media(prefers-reduced-motion:reduce){.deck-stage.shuffling .deck-layer,.deck-stage.shuffling .deck-face,.deck-stage.shuffling .deck-table{animation-duration:.1s;animation-delay:0s}}
+
+/* Simple full-deck drop shuffle. No bending, splitting, or riffle. */
+.deck-stage.shuffling .deck-layer {
+  animation: flat-card-drop 2.1s ease-in-out both;
+  animation-delay: calc(var(--i) * 8ms);
+}
+.deck-stage.shuffling .deck-face {
+  animation: flat-face-drop 2.1s ease-in-out both;
+}
+.deck-stage.shuffling .deck-table {
+  animation: flat-deck-settle 2.35s ease-in-out both;
+}
+@keyframes flat-card-drop {
+  0% {transform:translate(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px)) rotate(calc((var(--i) - 16)*.12deg));}
+  23% {transform:translate(calc((var(--i) - 16)*.6px),calc(-60px - var(--i)*1.6px)) rotate(calc((var(--i) - 16)*.22deg));}
+  53% {transform:translate(calc((var(--i) - 16)*1.1px),calc(48px - var(--i)*.22px)) rotate(calc((var(--i) - 16)*.45deg));}
+  72% {transform:translate(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px + 12px)) rotate(calc((var(--i) - 16)*.12deg));}
+  86% {transform:translate(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px - 7px)) rotate(calc((var(--i) - 16)*.12deg));}
+  100% {transform:translate(calc((var(--i) - 16)*.18px),calc((16 - var(--i))*1.3px)) rotate(calc((var(--i) - 16)*.12deg));}
+}
+@keyframes flat-face-drop {
+  0%,100% {transform:translate(0,-24px) rotate(-1deg);}
+  23% {transform:translate(0,-112px) rotate(-3deg);}
+  53% {transform:translate(0,48px) rotate(2deg);}
+  72% {transform:translate(0,-10px) rotate(-1deg);}
+  86% {transform:translate(0,-32px) rotate(-1deg);}
+}
+@keyframes flat-deck-settle {
+  0%,65%,100% {transform:rotateX(59deg) rotateZ(-10deg) translateY(-10px);}
+  77% {transform:rotateX(59deg) rotateZ(-10deg) translateY(29px);}
+  88% {transform:rotateX(59deg) rotateZ(-10deg) translateY(-18px);}
+}
+@media(max-width:520px) {
+ .deck-stage.shuffling .deck-table {animation-name:flat-deck-settle-mobile;}
+}
+@keyframes flat-deck-settle-mobile {
+  0%,65%,100% {transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(-10px);}
+  77% {transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(29px);}
+  88% {transform:scale(.79) rotateX(59deg) rotateZ(-10deg) translateY(-18px);}
+}
+
+/* Front-facing deck: remove the tabletop tilt while retaining the drop shuffle. */
+.deck-stage {height:410px; perspective:none;}
+.deck-table {transform:none; transform-style:flat; filter:drop-shadow(9px 13px 9px #0002);}
+@keyframes flat-deck-settle {
+  0%,65%,100% {transform:translateY(0);}
+  77% {transform:translateY(34px);}
+  88% {transform:translateY(-12px);}
+}
+@media (max-width:520px) {
+  .deck-stage {height:345px;}
+  .deck-table {transform:scale(.79);}
+}
+@keyframes flat-deck-settle-mobile {
+  0%,65%,100% {transform:scale(.79) translateY(0);}
+  77% {transform:scale(.79) translateY(34px);}
+  88% {transform:scale(.79) translateY(-12px);}
+}
+
+/* Two rounds of staggered left-and-right pile shuffling. */
+.deck-stage.shuffling .deck-layer {
+  animation-name: side-pile-shuffle;
+  animation-duration: 0.82s;
+  animation-timing-function: cubic-bezier(.38,.06,.24,1);
+  animation-delay: var(--delay);
+  animation-iteration-count: 2;
+  animation-fill-mode: both;
+}
+.deck-stage.shuffling .deck-face {
+  animation: side-face-shuffle 0.82s cubic-bezier(.38,.06,.24,1) 2 both;
+}
+.deck-stage.shuffling .deck-table {animation: none;}
+@keyframes side-pile-shuffle {
+  0%,100% {transform:translateX(calc((var(--i) - 16)*.18px)) translateY(calc((16 - var(--i))*1.3px));}
+  30%,52% {transform:translateX(calc(var(--side)*114px)) translateY(calc((16 - var(--i))*1.3px));}
+  78% {transform:translateX(calc(var(--side)*12px)) translateY(calc((16 - var(--i))*1.3px));}
+}
+@keyframes side-face-shuffle {
+  0%,100% {transform:translateX(0) translateY(-24px);}
+  30%,52% {transform:translateX(114px) translateY(-24px);}
+  78% {transform:translateX(12px) translateY(-24px);}
+}
+@media (prefers-reduced-motion:reduce) {
+  .deck-stage.shuffling .deck-layer,.deck-stage.shuffling .deck-face {animation-duration:.01ms;animation-delay:0ms;}
+}
+</style>
+</head>
+<body><main class="shell"><section class="stage"><div id="sealed" class="pack-area"><button id="pack" class="deck-stage" aria-label="Shuffle the full card deck"><span class="deck-table"><span class="deck-card deck-layer dark" style="--i:0;--side:-1;--delay:0ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:1;--side:-1;--delay:9ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:2;--side:-1;--delay:18ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:3;--side:-1;--delay:27ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:4;--side:-1;--delay:36ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:5;--side:-1;--delay:45ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:6;--side:-1;--delay:54ms" aria-hidden="true"></span><span class="deck-card deck-layer dark" style="--i:7;--side:-1;--delay:63ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:8;--side:-1;--delay:72ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:9;--side:-1;--delay:81ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:10;--side:-1;--delay:90ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:11;--side:-1;--delay:99ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:12;--side:-1;--delay:108ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:13;--side:-1;--delay:117ms" aria-hidden="true"></span><span class="deck-card deck-layer dark" style="--i:14;--side:-1;--delay:126ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:15;--side:-1;--delay:135ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:16;--side:1;--delay:0ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:17;--side:1;--delay:9ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:18;--side:1;--delay:18ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:19;--side:1;--delay:27ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:20;--side:1;--delay:36ms" aria-hidden="true"></span><span class="deck-card deck-layer dark" style="--i:21;--side:1;--delay:45ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:22;--side:1;--delay:54ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:23;--side:1;--delay:63ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:24;--side:1;--delay:72ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:25;--side:1;--delay:81ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:26;--side:1;--delay:90ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:27;--side:1;--delay:99ms" aria-hidden="true"></span><span class="deck-card deck-layer dark" style="--i:28;--side:1;--delay:108ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:29;--side:1;--delay:117ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:30;--side:1;--delay:126ms" aria-hidden="true"></span><span class="deck-card deck-layer light" style="--i:31;--side:1;--delay:135ms" aria-hidden="true"></span><span class="deck-card deck-face"><span class="deck-kicker">THE CARD DECK</span><span class="deck-title">SHUFFLE<br>THE<br>DECK.</span><span class="deck-bottom">1 PROMPT + 5 ANSWERS</span></span></span></button><button id="rip" class="btn">↻ SHUFFLE DECK</button></div><div id="game" class="hidden"><div class="bar"><span class="eyebrow">CARDS DEALT</span><button class="btn secondary" id="newPack">↻ SHUFFLE AGAIN</button></div><div class="black"><div class="eyebrow">BLACK PROMPT CARD</div><div id="blackText" class="prompt"></div><footer><span>01 / 06</span></footer></div><h3 class="heading">PICK ONE WHITE CARD</h3><div class="cards" id="answers"></div><section id="result" class="result hidden"><div class="eyebrow">YOUR FINAL DRAWING PROMPT</div><h2 id="resultText"></h2><div class="actions"><button class="btn secondary" id="copy">COPY PROMPT</button></div></section><section id="timer" class="timer hidden"><div class="timer-label">60-MINUTE DRAWING TIMER</div><div class="clock" id="clock" aria-live="off">60:00</div><div class="progress"><div id="progress"></div></div><div class="actions"><button class="btn" id="startPause">START TIMER</button><button class="btn secondary" id="reset">RESET</button></div><p id="done" class="hidden">Time's up. Show your drawing!</p></section></div></section></main>
+<script>
+'use strict';
+const prompts=["The ghost haunting my apartment is obsessed with _____.", "The vampire was banned from the costume party for _____.", "The witch accidentally summoned _____ instead of a familiar.", "The haunted house has a new employee: _____.", "The zombie apocalypse ended because of _____.", "The monster under my bed has a side hustle selling _____.", "The Grim Reaper took a day off to enjoy _____.", "The ancient curse can only be broken by _____.", "The creepy carnival has one attraction no one understands: _____.", "The real reason the mummy stayed in its tomb was _____.", "The pumpkin king demands a tribute of _____.", "The scariest thing found in the abandoned mall was _____.", "The werewolf started a podcast about _____.", "At midnight, the cemetery turns into a dance floor for _____.", "The ghost tried to scare everyone, but only managed _____.", "The potion turned the principal into _____.", "The mysterious figure in the fog was actually _____.", "The haunted mirror keeps showing me _____.", "The monster talent show was won by _____.", "The vampire opened a restaurant serving _____.", "The witch replaced her broomstick with _____.", "The secret boss in the haunted video game is _____.", "The only thing worse than a cursed doll is _____.", "The spell book specifically warns against _____.", "The ghosts held an emergency meeting about _____.", "The final room of the haunted maze contains _____.", "The zombie prom crowned _____ as prom royalty.", "The monster dating profile proudly features _____.", "The haunted school cafeteria now serves _____.", "Nobody expected the graveyard to be protected by _____.", "The creature in the attic has been practicing _____.", "The least intimidating demon is _____.", "The possessed TV keeps showing reruns of _____.", "The cryptid sighting turned out to be _____.", "The strangest trick-or-treater is _____.", "The newest witch business idea involves _____.", "The spooky portal opened and out came _____.", "The haunted aquarium is hiding _____.", "The witch council has officially banned _____.", "The cursed thrift store sells _____.", "The creature knocking at 3 a.m. only wants _____.", "A suspicious new neighbor turned out to be _____.", "The haunted elevator only stops for _____.", "My sleep paralysis demon is weirdly proud of _____.", "The monster under the bridge is running a business selling _____.", "The moon turned green after someone unleashed _____.", "The villain of the haunted cooking show is _____.", "A portal opened in the school gym and dropped _____.", "The possessed refrigerator will only accept _____.", "The last surviving human must defeat _____.", "The ghost convention was canceled because of _____.", "The haunted museum replaced every painting with _____.", "The final ingredient of the forbidden potion is _____.", "The vampire family reunion went wrong thanks to _____.", "The swamp creature has an embarrassing collection of _____.", "The new cryptid in town looks suspiciously like _____.", "The scarecrow was fired for bringing _____ to work.", "You're working the midnight shift at Target when aisle 13 suddenly fills with _____.", "It's 2:47 a.m. at Walmart and the only customer left is _____.", "Your first overnight shift at 7-Eleven gets weird when the security camera shows _____.", "You get home after a double shift and find _____ sitting on your couch.", "At 3 a.m., the Target self-checkout announces: 'Unexpected item in bagging area: _____.',", "The Walmart closing announcement politely asks _____ to leave the store.", "You're stocking shelves at midnight when someone asks where to find _____.", "The 7-Eleven slushie machine has started dispensing _____.", "The last bus home has only one passenger: _____.", "After a late shift, you open your fridge and discover _____.", "Your Ring doorbell recorded _____ entering your house at 3:33 a.m.", "The night manager at Target insists _____ is a totally normal employee.", "Walmart's overnight employee of the month is _____.", "The 7-Eleven parking lot is suspiciously crowded with _____.", "You clock out at 4 a.m., and _____ offers you a ride home.", "You turn on your bedroom light after a night shift and find _____.", "The gas station bathroom is occupied by _____.", "The security guard at the empty mall is arguing with _____.", "Your late-night Uber driver is actually _____.", "At the 24-hour laundromat, every washing machine contains _____.", "The only thing on the Target security footage is _____.", "The Walmart greeter has been replaced by _____.", "You hear a knock at 3 a.m. and open the door to _____.", "The overnight shift group chat just sent a photo of _____.", "You forgot to lock your front door, and now _____ lives in your kitchen.", "The 7-Eleven cashier silently points behind you at _____.", "At midnight, the Walmart clearance bin begins selling _____.", "You take the trash out after closing and meet _____.", "You check under the bed after work and find _____ filing a complaint.", "The Target mascot has been suspiciously replaced with _____."];
+const answers=["A ghost trying to learn the Macarena", "A vampire with a garlic bread addiction", "A witch whose broom has a parking ticket", "A zombie working the night shift at a coffee shop", "A mummy wrapped in toilet paper receipts", "A tiny Grim Reaper riding a tricycle", "A pumpkin with suspiciously human teeth", "A werewolf with a terrible haircut", "A possessed disco ball", "A cursed karaoke machine", "A ghost wearing a bedsheet over another bedsheet", "A haunted Roomba with a superiority complex", "A vampire livestreaming its skincare routine", "A black cat running an underground casino", "A scarecrow that secretly loves hugs", "An emotional support bat", "A pumpkin-headed corporate executive", "A zombie in a beauty pageant", "A ghost stuck in a vending machine", "A haunted rubber duck", "A witch running late for a dentist appointment", "A monster made entirely of mismatched socks", "A coffin converted into a gaming chair", "A spider who sells handmade sweaters", "A ghost with 37 unread emails", "A vampire who faints at the sight of ketchup", "A cursed family group chat", "A ghoul teaching yoga to tombstones", "A haunted microwave that only makes popcorn", "A zombie DJ playing elevator music", "A possessed plushie demanding a promotion", "A floating jack-o-lantern in a business suit", "A vampire stuck in a revolving door", "A mummy doing a dramatic runway walk", "A witch with a flying vacuum cleaner", "A ghost reviewing haunted houses online", "A graveyard full of synchronized dancers", "A demon whose only power is mild inconvenience", "A haunted vending machine selling screams", "A werewolf wearing tiny dog booties", "A suspiciously buff pumpkin", "A zombie holding a motivational seminar", "A ghost who charges rent for hauntings", "A bat driving a tiny hearse", "An ancient curse written in Comic Sans", "A monster made of expired candy", "A scarecrow hosting a true crime podcast", "A haunted selfie stick", "A wizard accidentally summoning 500 frogs", "A jack-o-lantern with a LinkedIn profile", "A haunted toaster predicting doom", "A dancing ghost with terrible rhythm", "A werewolf auditioning for a boy band", "A mummy trapped in a revolving office chair", "A vampire doing a fit check at midnight", "A ghost carrying an enormous iced coffee", "A zombie trying to pass a driving test", "A cursed pumpkin spice latte", "A haunted inflatable tube man", "A spider wearing eight tiny sneakers", "A ghost whose Wi-Fi password is BOO", "A Skibidi Toilet haunting the school bathroom", "Tung Tung Tung Sahur summoned by a witch", "A black cat slow-clapping with human hands", "A capybara completely unbothered by the apocalypse", "A Minecraft villager trapped in a crypt", "Chimpanzini Bananini livestreaming from a haunted store", "Bombardiro Crocodilo doing a midnight fit check", "Ballerina Cappuccina doing ballet at 3 a.m.", "Tralalero Tralala wearing vampire fangs", "A witch selling cursed energy drinks", "A ghost with a tiny emotional support ghost", "A vampire who works the daytime shift", "A haunted shopping cart that follows you home", "A demon in a customer service headset", "A swamp monster made of bubble tea", "A possessed office printer with revenge plans", "A cursed wedding cake that whispers secrets", "A zombie driving an ice cream truck", "An eyeball with eight spider legs", "A haunted mannequin practicing facial expressions", "A werewolf wearing a cone of shame", "A giant moth obsessed with porch lights", "A living shadow that keeps doing finger guns", "A sentient fog machine with stage fright", "A creepy doll hosting a cooking show", "A possessed traffic light giving relationship advice", "A black cat managing a haunted hotel", "A pile of teeth in a trench coat", "A jack-o-lantern running a pyramid scheme", "A gargoyle caught taking selfies", "A witch whose spellbook is all screenshots", "A demon with an unpaid parking ticket", "A ghost trapped inside a Bluetooth speaker", "A vampire who only drinks tomato soup", "A haunted pizza with too many eyes", "A giant spider who is scared of small spiders", "A swamp creature doing a skincare routine", "A blob monster with an existential crisis", "A cursed teddy bear with a podcast", "A floating eyeball wearing a monocle", "A possessed garden gnome stealing mail", "A zombie who is weirdly good at chess", "A bat-shaped drone delivering soup", "A werewolf who got a bad perm", "A monster made from old homework", "A witch riding a haunted office chair", "A talking gravestone that overshares", "A haunted washing machine full of frogs", "A cursed disco pumpkin", "A ghost working as a paranormal investigator", "A vampire stuck at the dentist", "A haunted clown car full of raccoons", "A scarecrow attending fashion week", "An alien pretending to be a normal pumpkin", "A monster with a hundred tiny hands", "A witch brewing instant noodles in a cauldron", "A cursed mirror giving unsolicited fashion advice", "A possessed vending machine dispensing spiders", "A zombie on a first date with a mannequin", "A giant carnivorous houseplant with braces", "A ghost trying to win an online argument", "A swamp monster running a five-star spa", "A haunted lamp that follows you with its eyes", "A sentient pile of autumn leaves", "A werewolf enthusiastically chasing a tennis ball", "A cursed croissant with vampire teeth", "A jellyfish ghost haunting a bathtub", "A goblin collecting expired coupons", "A giant mushroom with suspiciously tiny legs", "A vampire DJ who only plays elevator music", "A haunted toilet demanding a password", "A possessed phone with 999 notifications", "A capybara leading a zombie uprising", "A screaming cheese wheel on roller skates", "A haunted Wi-Fi router that knows your secrets", "A monster wearing a terrible human disguise", "A demon trapped in a claw machine", "A pumpkin piloting a giant robot", "A black cat secretly controlling the moon", "A zombie who became a motivational influencer", "An abandoned mascot costume moving on its own", "A cryptid posing for blurry security footage", "A cursed selfie that blinks first", "A witch accidentally spawning an army of rubber ducks", "A haunted supermarket aisle that never ends", "A vampire refusing to leave the group chat", "An enormous frog wearing a tiny crown", "A ghost carrying 12 iced coffees", "A haunted claw machine filled with eyeballs", "A 9-foot-tall receipt ghost asking for a refund", "A possessed Target shopping cart driving itself", "A Walmart greeter who is clearly three raccoons in a vest", "A 7-Eleven hot dog that has become self-aware", "A haunted Slurpee with an attitude problem", "A mannequin wearing your exact work uniform", "A vampire hunting for a buy-one-get-one deal", "A demon demanding to speak to the night manager", "A ghost scanning itself at self-checkout", "An entire cult of dancing traffic cones", "A cryptid shopping for frozen chicken nuggets", "A cursed Walmart rollback sticker on the moon", "A witch riding an electric shopping cart", "A zombie with an employee discount", "A shadow person collecting shopping baskets", "A possessed price scanner screaming 'SIX SEVEN'", "A giant moth living inside the freezer aisle", "A haunted break-room microwave with unfinished business", "A skeleton trying to return a used coffin", "An abandoned mascot suit asking for overtime pay", "A sleep paralysis demon in a Target name tag", "A floating bag of chips following you home", "A possessed 7-Eleven coffee pot predicting the future", "A goblin hoarding expired coupons under your bed", "A werewolf eating cereal on your kitchen floor", "A ghost sitting in your gaming chair playing Minecraft", "A cursed delivery pizza with an extra set of teeth", "A tall faceless customer who only buys bananas", "A possessed automatic door refusing to let anyone leave", "A sentient pile of unpaid parking tickets", "A vampire who only appears during the night shift", "A cursed rotisserie chicken whispering your name", "A 3 a.m. customer dressed like a Victorian ghost", "A black cat operating the security cameras", "An inflatable tube man lurking in your hallway", "A shopping cart full of tiny screaming pumpkins", "A ghost who won't stop asking for the Wi-Fi password", "A giant spider wearing a store manager badge", "A mysteriously wet floor sign that moves when you blink", "A skeleton asleep in the employee break room", "A cursed 7-Eleven nacho cheese dispenser", "A demon doing a TikTok dance in the cereal aisle", "A miniature Grim Reaper using the self-checkout", "A haunted vacuum cleaner charging you rent", "An uncanny cardboard cutout standing in your shower"];
+const $=id=>document.getElementById(id);let black='',whites=[],choice=-1,remain=3600,interval=null,endAt=0;
+function stopTimer(){if(interval!==null){clearInterval(interval);interval=null;}}
+function updateTimer(){const m=Math.floor(remain/60),s=remain%60;$('clock').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;$('progress').style.width=(remain/3600*100)+'%';$('done').classList.toggle('hidden',remain!==0);}
+function resetTimer(){stopTimer();remain=3600;updateTimer();$('startPause').textContent='START TIMER';}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function createPack(){stopTimer();$('timer').classList.add('hidden');$('result').classList.add('hidden');$('game').classList.remove('hidden');$('sealed').classList.add('hidden');resetTimer();choice=-1;black=prompts[Math.floor(Math.random()*prompts.length)];whites=shuffle([...answers]).slice(0,5);$('blackText').textContent=black;const grid=$('answers');grid.replaceChildren();whites.forEach((a,i)=>{const b=document.createElement('button');b.className='answer';b.setAttribute('aria-pressed','false');const num=document.createElement('span');num.className='number';num.textContent='CARD 0'+(i+2);const strong=document.createElement('strong');strong.textContent=a;const foot=document.createElement('footer');foot.textContent='WHITE CARD';b.append(strong,foot);b.addEventListener('click',()=>selectCard(i));grid.append(b);});}
+function selectCard(i){choice=i;document.querySelectorAll('.answer').forEach((el,j)=>{el.classList.toggle('selected',i===j);el.setAttribute('aria-pressed',String(i===j));});$('resultText').textContent=black.replace('_____',whites[i]);$('result').classList.remove('hidden');$('timer').classList.add('hidden');resetTimer();}
+let shuffling=false;
+function openPack(){if(shuffling)return;shuffling=true;$('pack').classList.add('shuffling');$('rip').disabled=true;setTimeout(()=>{createPack();$('game').classList.add('game-reveal');$('pack').classList.remove('shuffling');$('rip').disabled=false;shuffling=false;},1850);}
+function reshuffle(){if(shuffling)return;stopTimer();$('game').classList.add('hidden');$('sealed').classList.remove('hidden');requestAnimationFrame(()=>requestAnimationFrame(openPack));}
+$('pack').addEventListener('click',openPack);$('rip').addEventListener('click',openPack);$('newPack').addEventListener('click',reshuffle);$('copy').addEventListener('click',async()=>{const text=$('resultText').textContent;try{await navigator.clipboard.writeText(text);$('copy').textContent='COPIED!';setTimeout(()=>$('copy').textContent='COPY PROMPT',1300);}catch{window.prompt('Copy your prompt:',text);}});
+$('startPause').addEventListener('click',()=>{if(interval!==null){remain=Math.max(0,Math.ceil((endAt-Date.now())/1000));stopTimer();$('startPause').textContent='RESUME TIMER';updateTimer();return;}if(remain===0)remain=3600;endAt=Date.now()+remain*1000;$('startPause').textContent='PAUSE TIMER';interval=setInterval(()=>{remain=Math.max(0,Math.ceil((endAt-Date.now())/1000));updateTimer();if(remain===0){stopTimer();$('startPause').textContent='START AGAIN';}},200);});$('reset').addEventListener('click',resetTimer);
+</script></body></html>
